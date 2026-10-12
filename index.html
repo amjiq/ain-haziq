@@ -311,13 +311,30 @@ button.pill{border:0;font-family:var(--sans);cursor:pointer;width:100%}
   var WA='60123456789',cnt=1,ct=document.getElementById('ct'),nm=document.getElementById('nm');
   document.getElementById('mn').addEventListener('click',function(){cnt=Math.max(1,cnt-1);ct.textContent=cnt});
   document.getElementById('pl').addEventListener('click',function(){cnt=Math.min(10,cnt+1);ct.textContent=cnt});
+  var FORM='https://docs.google.com/forms/d/e/1FAIpQLSctWCQ2ur1MRP8dS77ke55zSp6_OYJqFlBG1iEqShe8Vm1DLQ/formResponse',busy=false;
+  function done(status){
+    var r=document.querySelector('.rsvp'),p=document.createElement('p');
+    p.textContent=status==='Hadir'?'Terima kasih, jawapan anda telah dihantar. Jumpa nanti!':'Terima kasih kerana memaklumkan.';
+    p.style.cssText='text-align:center;font-family:var(--serif);font-style:italic;font-size:26px;line-height:1.3;color:var(--sage);margin:28px 0 0';
+    r.innerHTML='';r.appendChild(p);
+  }
+  function sheet(status,msg){
+    var n=nm.value.trim();
+    if(!n){nm.focus();return}
+    if(busy)return;busy=true;
+    var body=new URLSearchParams();
+    body.append('entry.366340186',n);
+    body.append('entry.877163635',status);
+    body.append('entry.1416367634',status==='Hadir'?String(cnt):'0');
+    fetch(FORM,{method:'POST',mode:'no-cors',body:body}).then(function(){done(status)}).catch(function(){busy=false;send(msg)});
+  }
   function send(msg){
     if(!nm.value.trim()){nm.focus();return}
     var u='https://wa.me/'+WA+'?text='+encodeURIComponent(msg.replace('{n}',nm.value.trim()));
     if(!window.open(u,'_blank','noopener'))location.href=u;
   }
-  document.getElementById('yes').addEventListener('click',function(){send('Assalamualaikum, saya {n} akan hadir ke majlis Ain & Haziq pada Jumaat, 5 Februari 2027 bersama '+cnt+' orang (termasuk saya).')});
-  document.getElementById('no').addEventListener('click',function(){send('Assalamualaikum, maaf, saya {n} tidak dapat hadir ke majlis Ain & Haziq. Semoga majlis berjalan lancar.')});
+  document.getElementById('yes').addEventListener('click',function(){sheet('Hadir','Assalamualaikum, saya {n} akan hadir ke majlis Ain & Haziq pada Jumaat, 5 Februari 2027 bersama '+cnt+' orang (termasuk saya).')});
+  document.getElementById('no').addEventListener('click',function(){sheet('Tak dapat hadir','Assalamualaikum, maaf, saya {n} tidak dapat hadir ke majlis Ain & Haziq. Semoga majlis berjalan lancar.')});
 })();
 </script>
 </body>
